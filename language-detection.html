@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Language Detection | Tokens And Truths</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .brand {
+            color: #764ba2;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 25px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        #result {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 600;
+            padding: 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand">Tokens And Truths</div>
+        <h1>Language Detection</h1>
+        <p>Discover the language of any text using advanced AI detection. Simply paste your content below and let the magic happen.</p>
+
+        <div class="input-group">
+            <textarea id="inputText" placeholder="Type or paste text here..."></textarea>
+        </div>
+        
+        <button onclick="detectLanguage()">Detect Language</button>
+        
+        <div id="result">Ready to detect language...</div>
+        
+        <div class="footer">
+            Powered by Chrome AI APIs
+        </div>
+    </div>
+
+    <script>
+
+        let languageDetector;
+
+        async function initializeLanguageDetector() {
+            languageDetector = await LanguageDetector.create({
+                monitor(m) {
+                    m.addEventListener('downloadprogress', (e) => {
+                        console.log(`Download progress: ${e.loaded * 100} %`)
+                    });
+                }
+            });
+        }
+
+        if ('LanguageDetector' in self) {
+            initializeLanguageDetector();
+            console.log('Language Detector initialized successfully.');
+        }
+
+        async function detectLanguage() {
+            const text = document.getElementById('inputText').value;
+            const lang = await getLanguage(text);
+            document.getElementById('result').innerText = `Detected Language: ${lang}`;
+        }
+
+        async function getLanguage(text) {
+           const results = await languageDetector.detect(text);
+           return results[0].detectedLanguage;
+        }
+    </script>
+    
+</body>
+</html>

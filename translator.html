@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Translator | Tokens And Truths</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .brand {
+            color: #764ba2;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .control-group {
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            background: white;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 25px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .result-section {
+            text-align: left;
+        }
+
+        .result-title {
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        #translationResult {
+            color: #333;
+            font-size: 1rem;
+            line-height: 1.6;
+            padding: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            min-height: 80px;
+            white-space: pre-wrap;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+
+            .controls {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand">Tokens And Truths</div>
+        <h1>AI Translator</h1>
+        <p>Break down language barriers with instant, accurate translations powered by advanced AI technology.</p>
+
+        <div class="input-group">
+            <textarea id="inputText" placeholder="Type or paste text to translate here..."></textarea>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <label for="fromLanguage">From Language</label>
+                <select id="fromLanguage">
+                    <option value="en">English</option>
+                    <option value="af">Afrikaans</option>
+                    <option value="am">Amharic</option>
+                    <option value="ar">Arabic</option>
+                    <option value="hy">Armenian</option>
+                    <option value="az">Azerbaijani</option>
+                    <option value="be">Belarusian</option>
+                    <option value="bn">Bengali</option>
+                    <option value="bg">Bulgarian</option>
+                    <option value="zh">Chinese (Simplified)</option>
+                    <option value="zh-TW">Chinese (Traditional)</option>
+                    <option value="hr">Croatian</option>
+                    <option value="cs">Czech</option>
+                    <option value="da">Danish</option>
+                    <option value="nl">Dutch</option>
+                    <option value="et">Estonian</option>
+                    <option value="tl">Filipino</option>
+                    <option value="fi">Finnish</option>
+                    <option value="fr">French</option>
+                    <option value="ka">Georgian</option>
+                    <option value="de">German</option>
+                    <option value="el">Greek</option>
+                    <option value="gu">Gujarati</option>
+                    <option value="ha">Hausa</option>
+                    <option value="he">Hebrew</option>
+                    <option value="hi">Hindi</option>
+                    <option value="hu">Hungarian</option>
+                    <option value="id">Indonesian</option>
+                    <option value="it">Italian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="kn">Kannada</option>
+                    <option value="kk">Kazakh</option>
+                    <option value="km">Khmer</option>
+                    <option value="ko">Korean</option>
+                    <option value="ky">Kyrgyz</option>
+                    <option value="lo">Lao</option>
+                    <option value="lv">Latvian</option>
+                    <option value="lt">Lithuanian</option>
+                    <option value="ml">Malayalam</option>
+                    <option value="ms">Malay</option>
+                    <option value="mn">Mongolian</option>
+                    <option value="my">Myanmar</option>
+                    <option value="ne">Nepali</option>
+                    <option value="no">Norwegian</option>
+                    <option value="fa">Persian</option>
+                    <option value="pl">Polish</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="pa">Punjabi</option>
+                    <option value="ro">Romanian</option>
+                    <option value="ru">Russian</option>
+                    <option value="si">Sinhala</option>
+                    <option value="sk">Slovak</option>
+                    <option value="sl">Slovenian</option>
+                    <option value="es">Spanish</option>
+                    <option value="sw">Swahili</option>
+                    <option value="sv">Swedish</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="th">Thai</option>
+                    <option value="tr">Turkish</option>
+                    <option value="uk">Ukrainian</option>
+                    <option value="ur">Urdu</option>
+                    <option value="uz">Uzbek</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="yo">Yoruba</option>
+                    <option value="zu">Zulu</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="toLanguage">To Language</label>
+                <select id="toLanguage">
+                    <option value="en">English</option>
+                    <option value="af">Afrikaans</option>
+                    <option value="am">Amharic</option>
+                    <option value="ar">Arabic</option>
+                    <option value="hy">Armenian</option>
+                    <option value="az">Azerbaijani</option>
+                    <option value="be">Belarusian</option>
+                    <option value="bn">Bengali</option>
+                    <option value="bg">Bulgarian</option>
+                    <option value="zh">Chinese (Simplified)</option>
+                    <option value="zh-TW">Chinese (Traditional)</option>
+                    <option value="hr">Croatian</option>
+                    <option value="cs">Czech</option>
+                    <option value="da">Danish</option>
+                    <option value="nl">Dutch</option>
+                    <option value="et">Estonian</option>
+                    <option value="tl">Filipino</option>
+                    <option value="fi">Finnish</option>
+                    <option value="fr">French</option>
+                    <option value="ka">Georgian</option>
+                    <option value="de">German</option>
+                    <option value="el">Greek</option>
+                    <option value="gu">Gujarati</option>
+                    <option value="ha">Hausa</option>
+                    <option value="he">Hebrew</option>
+                    <option value="hi">Hindi</option>
+                    <option value="hu">Hungarian</option>
+                    <option value="id">Indonesian</option>
+                    <option value="it">Italian</option>
+                    <option value="ja">Japanese</option>
+                    <option value="kn">Kannada</option>
+                    <option value="kk">Kazakh</option>
+                    <option value="km">Khmer</option>
+                    <option value="ko">Korean</option>
+                    <option value="ky">Kyrgyz</option>
+                    <option value="lo">Lao</option>
+                    <option value="lv">Latvian</option>
+                    <option value="lt">Lithuanian</option>
+                    <option value="ml">Malayalam</option>
+                    <option value="ms">Malay</option>
+                    <option value="mn">Mongolian</option>
+                    <option value="my">Myanmar</option>
+                    <option value="ne">Nepali</option>
+                    <option value="no">Norwegian</option>
+                    <option value="fa">Persian</option>
+                    <option value="pl">Polish</option>
+                    <option value="pt">Portuguese</option>
+                    <option value="pa">Punjabi</option>
+                    <option value="ro">Romanian</option>
+                    <option value="ru">Russian</option>
+                    <option value="si">Sinhala</option>
+                    <option value="sk">Slovak</option>
+                    <option value="sl">Slovenian</option>
+                    <option value="es" selected>Spanish</option>
+                    <option value="sw">Swahili</option>
+                    <option value="sv">Swedish</option>
+                    <option value="ta">Tamil</option>
+                    <option value="te">Telugu</option>
+                    <option value="th">Thai</option>
+                    <option value="tr">Turkish</option>
+                    <option value="uk">Ukrainian</option>
+                    <option value="ur">Urdu</option>
+                    <option value="uz">Uzbek</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="yo">Yoruba</option>
+                    <option value="zu">Zulu</option>
+                </select>
+            </div>
+        </div>
+
+        <button onclick="translateText()">Translate Text</button>
+
+        <div class="result-section">
+            <div class="result-title">Translation</div>
+            <div class="loader" id="loader"></div>
+            <div id="translationResult">Your translation will appear here...</div>
+        </div>
+
+        <div class="footer">
+            Powered by Chrome AI APIs
+        </div>
+    </div>
+
+    <script>
+        let isTranslatorAvailable = 'Translator' in self;
+
+        async function createTranslator(options) {
+            return await Translator.create(options);
+        }
+
+        async function translateText() {
+            if (!isTranslatorAvailable) {
+                alert('Translator API is not available in your environment.');
+                return;
+            }
+
+            const loader = document.getElementById('loader');
+            const result = document.getElementById('translationResult');
+            
+            loader.style.display = 'block';
+            result.textContent = '';
+
+            const text = document.getElementById('inputText').value;
+            const fromLang = document.getElementById('fromLanguage').value;
+            const toLang = document.getElementById('toLanguage').value;
+
+            const options = {
+                sourceLanguage: fromLang,
+                targetLanguage: toLang,
+                monitor(m) {
+                    m.addEventListener('downloadprogress', (e) => {
+                        console.log(`Translation progress: ${e.loaded * 100} %`)
+                    });
+                }
+            };
+
+            try {
+                const translator = await createTranslator(options);
+                const translation = await translator.translate(text);
+                result.innerText = translation;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
